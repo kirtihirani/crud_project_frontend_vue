@@ -1,11 +1,10 @@
 import { createRouter,createWebHistory } from "vue-router";
-import AddEmployee from './components/AddEmployee.vue'
  const routes=[
-    {
-        name:'AddEmployee',
-        path:'/AddEmployee',
-        component:AddEmployee
-    }
+    // {
+    //     name:'AddEmployee',
+    //     path:'/AddEmployee',
+    //     component:AddEmployee
+    // }
  ]
 
  const router= createRouter(
