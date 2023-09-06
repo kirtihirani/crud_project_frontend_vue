@@ -1,14 +1,16 @@
 <template>
-    <div class="d-grid gap-2">
-  <router-link to="/AddEmployee"><button class="btn btn-primary" type="button">Add Employee</button>
-  </router-link>
-  <router-view></router-view>
+<div class="d-grid gap-2">
+ <AddEmployee1 />
   <button class="btn btn-primary" type="button">Add Department</button>
 </div>
 </template>
 
 <script>
+
+import AddEmployee1 from './AddEmployee1.vue';
 export default {
-    name:'Home'
+  components: { AddEmployee1 },
+    name:'Home',
+    AddEmployee1
 }
 </script>
