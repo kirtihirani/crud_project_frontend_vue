@@ -7,6 +7,14 @@
     @click="addClick()">
      Add Employee
     </button>
+
+    <button
+    type="button"
+    class="btn btn-primary m-2 fload-end"
+    @click="getClick()"
+    >
+        Find Employee
+    </button>
     
     <table class="table table-striped">
     <thead>
@@ -116,6 +124,8 @@
 
 <script>
 import axios from 'axios'
+// import qs from 'qs'
+ import CryptoJS from 'crypto-js'
 export default {
     name:'AddEmployee1',
     data(){
@@ -132,6 +142,7 @@ export default {
         }
     },
     methods:{
+
         refreshData(){
             axios.get("http://127.0.0.1:8000/"+"employees")
             .then((response)=>{
@@ -204,7 +215,129 @@ export default {
                 .then((response)=>{
                     this.PhotoFileName=response.data;
                 });
-        }
+        },
+
+        padData(data){
+            const block_size = 16;
+            const padding_char = String.fromCharCode(block_size - (data.length % block_size));
+            const padding = padding_char.repeat(block_size - (data.length % block_size))
+            return data + padding;
+        },
+
+        generateKey(){
+            return window.crypto.subtle.generateKey(
+                {
+                    name:'AES-ECB',
+                    length:256
+                },
+                true,
+                ['encrypt']
+            )
+            .then((key)=> {
+                return window.crypto.subtle.exportKey('raw',key);
+            })
+            .then((rawKey)=>{
+                console.log(rawKey)
+            })
+        },
+
+
+        getClick(){
+            // const key__ = this.generateKey()
+            // console.log(key__)
+            const queryParams = {
+                "emp_id":1,
+            }
+            console.log(queryParams)
+            //ECB mode---------------------final
+            //  const queryParamsJson = JSON.stringify(queryParams)
+            //const sessionKey = CryptoJS.lib.WordArray.random(32);
+            // console.log(`sessionKey in bytes: ${sessionKey}`)
+            // const sessionKeyHex = sessionKey.toString(CryptoJS.enc.Hex);
+            // console.log(`session key in hex:${sessionKeyHex}`)
+            // const encryptedQueryParams = CryptoJS.AES.encrypt(
+            //     queryParamsJson,sessionKey, {mode: CryptoJS.mode.ECB}
+            // ).toString();
+            // // const paddedData = this.padData(encryptedQueryParams)
+            // // console.log(`padded data ${paddedData}`)
+            // console.log(`encypted query params with cryptoks aes encryption ${encryptedQueryParams}`)
+            // const encodedQueryParams = btoa(encryptedQueryParams);
+            // console.log(encodedQueryParams)
+            // const finalurl = `http://127.0.0.1:8000/employees?params=${encodedQueryParams}`
+            // const axiosInstance = axios.create({
+            //     headers: {
+            //         'X-Session-Key':sessionKey
+            //     }
+            // })
+            //------------------------------------
+
+
+
+            //try again
+             const secretkeyhex = "UKWpScKmgXpU40rm"
+            //  const secretkeybytes = new Uint8Array(secretkeyhex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            // const byteArray = [] ;
+            // for(let i=0; i<secretkeyhex.length; i+=2){
+            //     byteArray.push(parseInt(secretkeyhex.substring(i, 2),16));
+            // }
+            // const hexkeybytes = byteArray
+            // while(hexkeybytes.length<32){
+            //     hexkeybytes.push(0)
+            // }
+            // const secretkeybytes = hexkeybytes
+            // console.log(secretkeybytes)
+            
+            // // const secretkeybytes = '123456'
+            // // const sckb = CryptoJS.enc.Hex.parse(secretkeybytes)
+            // // console.log(sckb)
+            // const encryptedQueryParams = CryptoJS.AES.encrypt(
+            //     queryParamsJson,secretkeybytes, {mode: CryptoJS.mode.ECB}
+            // ).toString();
+            // console.log(encryptedQueryParams)
+            // const finalurl = `http://127.0.0.1:8000/employees?params=${encryptedQueryParams}`
+            // const axiosInstance = axios.create({
+            //     headers: {
+            //         'X-Session-Key':secretkeybytes
+            //     }
+            // })
+
+            //EAX mode
+            const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(queryParams), secretkeyhex);
+            // console.log(JSON.parse(ciphertext))
+            console.log(ciphertext.toString())
+            
+            const finalurl = `http://127.0.0.1:8000/employees?params=${ciphertext}`
+            
+
+            axios.get(finalurl)
+            .then((response)=>{
+                this.employees=response.data;
+                console.log(response.data)
+            });
+        },
+
+//cbc-mode
+//         getClick(){
+//             const plaintext = {
+//                 "emp_id":1
+//             };
+
+// // Generate a random 256-bit (32-byte) encryption key
+//             const key = CryptoJS.lib.WordArray.random(32);
+
+// // Generate a random 128-bit (16-byte) IV (Initialization Vector)
+//             const iv = CryptoJS.lib.WordArray.random(16);
+
+// // Encrypt the data using AES-CBC mode
+//             const ciphertext = CryptoJS.AES.encrypt(plaintext, key, {
+//             iv: iv,
+//             mode: CryptoJS.mode.CBC,
+//         });
+
+// // Encode the ciphertext and IV as base64 for transmission
+//             // const encryptedData = btoa(iv + ciphertext);
+//             console.log(ciphertext)
+//         }
     
     },
     mounted:function(){
